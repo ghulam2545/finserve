@@ -1,5 +1,5 @@
 services:
-  postgres:
+  auth-postgres:
     image: postgres:16
     container_name: auth-postgres
     restart: unless-stopped
@@ -21,9 +21,34 @@ services:
     networks:
       - auth-net
 
+  customer-postgres:
+    image: postgres:16
+    container_name: customer-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: customer_db
+      POSTGRES_USER: customer_user
+      POSTGRES_PASSWORD: customer_pass
+    ports:
+      - "5402:5432"
+    volumes:
+      - customer-data:/var/lib/postgresql/data
+      - ./customer/init-scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U customer_user -d customer_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - customer-net
+
 volumes:
   auth-data:
+  customer-data:
 
 networks:
   auth-net:
+    driver: bridge
+  customer-net:
     driver: bridge

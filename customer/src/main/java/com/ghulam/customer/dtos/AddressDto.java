@@ -2,7 +2,9 @@ package com.ghulam.customer.dtos;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 
+@Builder
 public record AddressDto(
 
         @NotBlank(message = "Address line 1 is required")

@@ -6,7 +6,7 @@ import com.ghulam.customer.services.CustomerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
+import org.springframework.security.core.Authentication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +23,9 @@ public class CustomerController {
 
     @GetMapping("/me")
     public ResponseEntity<CustomerProfileResponse> getMyProfile(Authentication authentication) {
-        return null;
+        UUID userId = extractUserId(authentication);
+        CustomerProfileResponse response = customerService.getCustomerById(userId);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/me")
@@ -36,6 +38,21 @@ public class CustomerController {
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<CustomerProfileResponse> getCustomerById(@PathVariable UUID customerId) {
         return null;
+    }
+
+    private UUID extractUserId(Authentication authentication) {
+        if (authentication == null || authentication.getPrincipal() == null) {
+            throw new RuntimeException("User is not authenticated: 401");
+        }
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UUID uuid) {
+            return uuid;
+        }
+        try {
+            return UUID.fromString(principal.toString());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid user ID in token principal: 401");
+        }
     }
 
 }

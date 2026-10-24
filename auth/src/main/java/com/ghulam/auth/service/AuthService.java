@@ -10,6 +10,7 @@ import com.ghulam.auth.entities.UserRole;
 import com.ghulam.auth.repo.RefreshTokenRepository;
 import com.ghulam.auth.repo.UserRepository;
 import com.ghulam.auth.security.TokenService;
+import com.ghulam.common.events.UserRegisteredEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,6 +30,7 @@ public class AuthService {
     private final RefreshTokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService; // JSON Web Token service
+    private final UserEventService userEventService;
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
@@ -56,6 +58,17 @@ public class AuthService {
             log.error("Failed to register user with email {}: {}", email, e.getMessage());
             throw new RuntimeException("User registration failed, please try again later.", e);
         }
+
+        UserRegisteredEvent event = UserRegisteredEvent.builder()
+                .userId(user.getId().toString())
+                .email(user.getEmail())
+                .firstName(request.firstName())
+                .lastName(request.lastName())
+                .role(user.getRole().name())
+                .build();
+
+        userEventService.publishUserRegistered(event,"SOMETHING");
+        log.info("Published UserRegisteredEvent for user: {}", user.getId());
 
         return AuthResponse.builder()
                 .userId(user.getId())

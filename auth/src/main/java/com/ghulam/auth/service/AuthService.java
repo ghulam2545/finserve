@@ -67,7 +67,7 @@ public class AuthService {
                 .role(user.getRole().name())
                 .build();
 
-        userEventService.publishUserRegistered(event,"SOMETHING");
+        userEventService.publishUserRegistered(event);
         log.info("Published UserRegisteredEvent for user: {}", user.getId());
 
         return AuthResponse.builder()

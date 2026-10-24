@@ -7,7 +7,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 
 @Slf4j
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.ghulam")
 public class CustomerApplication {
 
     private static final String LOG_SEPARATOR = "──────────────────────────────────────────────────────: ";

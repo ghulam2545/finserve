@@ -20,6 +20,7 @@ services:
       start_period: 10s
     networks:
       - auth-net
+      - finserve-net
 
   customer-postgres:
     image: postgres:16
@@ -42,6 +43,7 @@ services:
       start_period: 10s
     networks:
       - customer-net
+      - finserve-net
 
   kafka-service:
     image: apache/kafka:4.3.1
@@ -75,6 +77,8 @@ services:
 
     volumes:
       - kafka_data:/tmp/kraft-combined-logs
+    networks:
+      - finserve-net
 
 volumes:
   auth-data:
@@ -85,4 +89,6 @@ networks:
   auth-net:
     driver: bridge
   customer-net:
+    driver: bridge
+  finserve-net:
     driver: bridge

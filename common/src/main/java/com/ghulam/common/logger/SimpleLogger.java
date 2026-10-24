@@ -1,18 +1,24 @@
 package com.ghulam.common.logger;
 
+import org.springframework.beans.factory.annotation.Value;
+
 import java.io.PrintStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public final class SimpleLogger {
 
-    public static final String LOG_SEPARATOR = "─────── ";
+    public static final String LOG_SEPARATOR = "───────: ";
     private static final Object LOG_LOCK = new Object();
     private static final StackWalker STACK_WALKER = StackWalker.getInstance();
+    private static final AtomicInteger MAX_HEADER_LENGTH = new AtomicInteger(80);
     private static final DateTimeFormatter DATE_FORMATTER =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
+    @Value("${app.logs.print-date:false}")
+    private boolean printDate;
     private final String name;
 
     private SimpleLogger(String name) {
@@ -51,11 +57,20 @@ public final class SimpleLogger {
                         .map(StackWalker.StackFrame::toStackTraceElement)
                         .orElse(null));
 
-        StringBuilder output = new StringBuilder()
-                .append(LocalDateTime.now().format(DATE_FORMATTER))
-                .append(" [ ").append(name).append(" --- ")
-                .append(caller != null ? caller.getMethodName() + ":" + caller.getLineNumber() : "")
-                .append(" ] ")
+        String location = caller != null ? caller.getMethodName() + ":" + caller.getLineNumber() : "";
+        StringBuilder header = new StringBuilder();
+        if (printDate)
+            header.append(LocalDateTime.now().format(DATE_FORMATTER)).append(' ');
+
+        header.append("[ ")
+                .append(name)
+                .append(" --- ")
+                .append(location)
+                .append(" ]");
+
+        int width = MAX_HEADER_LENGTH.accumulateAndGet(
+                header.length(), Math::max);
+        StringBuilder output = new StringBuilder(header).repeat(" ", width - header.length())
                 .append(LOG_SEPARATOR)
                 .append(message);
 

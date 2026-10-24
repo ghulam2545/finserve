@@ -11,6 +11,7 @@ import com.ghulam.auth.repo.RefreshTokenRepository;
 import com.ghulam.auth.repo.UserRepository;
 import com.ghulam.auth.security.TokenService;
 import com.ghulam.common.events.UserRegisteredEvent;
+import com.ghulam.common.logger.SimpleLogger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,7 +22,6 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -31,6 +31,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService; // JSON Web Token service
     private final UserEventService userEventService;
+    private final SimpleLogger log = SimpleLogger.getLogger(AuthService.class);
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {

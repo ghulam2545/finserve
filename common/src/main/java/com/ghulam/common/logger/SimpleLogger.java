@@ -31,6 +31,10 @@ public final class SimpleLogger {
         log(LogLevel.ERROR, message, arguments);
     }
 
+    public void warn(String message, Object... arguments) {
+        log(LogLevel.WARN, message, arguments);
+    }
+
     private void log(LogLevel level, String pattern, Object... args) {
         Throwable error = null;
         if (args != null && args.length > 0

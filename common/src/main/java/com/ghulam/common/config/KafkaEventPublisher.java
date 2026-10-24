@@ -1,17 +1,18 @@
 package com.ghulam.common.config;
 
+import com.ghulam.common.logger.SimpleLogger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 
 import java.util.UUID;
 
-@Slf4j
 @RequiredArgsConstructor
 public class KafkaEventPublisher {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final String serviceName;
+    private final SimpleLogger log = SimpleLogger.getLogger(KafkaEventPublisher.class);
 
     /**
      * Publish a domain event to Kafka.
